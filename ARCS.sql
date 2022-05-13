@@ -18,6 +18,7 @@ SELECT
     SUM (ReconcillingItemBal) as ReconcillingItemBal,
     PERIOD_NAME,
     ACCOUNT_TYPE_NAME,
+    REO_RECONCILIATION_NAME,
     '~CURRENCY~' AS CURRENCY
 FROM (
         SELECT
@@ -44,7 +45,8 @@ FROM (
             ) AS UnExplainedBal,
             
             PERIOD_NAME,
-            ACCOUNT_TYPE_NAME
+            ACCOUNT_TYPE_NAME,
+            REO_RECONCILIATION_NAME
         
         FROM (
                 SELECT innerSubQry.PERIOD_NAME,
@@ -56,7 +58,8 @@ FROM (
                         innerSubQry.STATUS_ID,
                         innerSubQry.REO_PERIOD_ID,
                         innerSubQry.REO_RECONCILIATION_ID,
-                        innerSubQry.REO_RECONCILIATION_ACCOUNT_ID,  
+                        innerSubQry.REO_RECONCILIATION_ACCOUNT_ID,
+                        innerSubQry.REO_RECONCILIATION_NAME,  
                         innerSubQry.LIST_VALUE_ID,
                         
                         (SELECT SUM (
@@ -189,6 +192,7 @@ FROM (
                             ReconciliationEO.PERIOD_ID AS REO_PERIOD_ID,
                             ReconciliationEO.RECONCILIATION_ID AS REO_RECONCILIATION_ID,
                             ReconciliationEO.RECONCILIATION_ACCOUNT_ID AS REO_RECONCILIATION_ACCOUNT_ID,
+                            ReconciliationEO.RECONCILIATION_NAME AS REO_RECONCILIATION_NAME,
                             AttributeListValueEO18A.LIST_VALUE_ID
                         FROM
                             ARM_RECONCILIATIONS ReconciliationEO
@@ -232,4 +236,5 @@ FROM (
 
 group by 
     Period_name ,
-    ACCOUNT_TYPE_NAME
+    ACCOUNT_TYPE_NAME,
+    REO_RECONCILIATION_NAME
