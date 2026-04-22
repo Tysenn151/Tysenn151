@@ -23,12 +23,26 @@
       margin: 0;
       min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #0f172a, #111827);
       color: var(--text);
       display: flex;
       justify-content: center;
       align-items: flex-start;
       padding: 48px 20px;
+      position: relative;
+      overflow-x: hidden;
+      background: #111827;
+    }
+
+    /* Blueprint background layer */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(15, 23, 42, 0.82), rgba(17, 24, 39, 0.88)),
+        url("Launch_Pad_Map.png") center center / cover no-repeat;
+      z-index: -1;
+      opacity: 0.95;
     }
 
     .container {
@@ -57,6 +71,16 @@
       padding: 22px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
       margin-bottom: 24px;
+    }
+
+    .card {
+      background: rgba(31, 41, 55, 0.82); /* slightly more transparent */
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      margin-bottom: 24px;
+      backdrop-filter: blur(3px); /* subtle glass effect */
     }
 
     form {
@@ -141,7 +165,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Launch Pad <a href="Launch_pad_map.html" target="_self">🚀</a></h1>
+    <h1>Launch Pad <a href="Launch_Pad_Map.html" target="_self">🚀</a></h1>
     <div class="subtitle">A clean homepage with Google search and your favorite links.</div>
 
     <div class="search-card">
