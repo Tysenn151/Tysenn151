@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Launch Pad Map</title>
-
   <style>
     :root {
       --bg: #111827;
+      --panel: rgba(15, 23, 42, 0.94);
+      --panel-border: rgba(148, 163, 184, 0.28);
       --text: #f9fafb;
-      --muted: #9ca3af;
+      --muted: #cbd5e1;
       --accent: #3b82f6;
       --accent-hover: #2563eb;
       --border: #374151;
@@ -23,35 +24,38 @@
       font-family: Arial, sans-serif;
       color: var(--text);
       background: linear-gradient(180deg, #0f172a, #111827);
-
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-
       padding: 20px;
     }
 
-    .container {
+    .page {
       width: 100%;
-      max-width: 1400px;
+      max-width: 1500px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
-    .header {
-      width: 100%;
+    .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
-    h1 {
+    .title-wrap h1 {
       margin: 0;
       font-size: 1.5rem;
       color: #dbeafe;
+    }
+
+    .title-wrap .subtitle {
+      color: #9ca3af;
+      font-size: 0.95rem;
+      margin-top: 4px;
     }
 
     .back-btn {
@@ -62,7 +66,8 @@
       color: var(--text);
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.2s ease;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
     }
 
     .back-btn:hover {
@@ -70,53 +75,246 @@
       border-color: var(--accent);
     }
 
-    .image-wrapper {
+    .map-stage {
       width: 100%;
-      height: calc(100vh - 120px);
       display: flex;
-      align-items: center;
       justify-content: center;
     }
 
-    .image-wrapper img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    .map-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 1500px;
+      line-height: 0;
     }
 
-    .footer {
-      font-size: 0.85rem;
+    .map-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .hotspot {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid transparent;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hotspot:hover,
+    .hotspot:focus-visible {
+      background: rgba(59, 130, 246, 0.08);
+      border-color: rgba(125, 211, 252, 0.35);
+      box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.15);
+      outline: none;
+    }
+
+    .tooltip {
+      position: fixed;
+      display: none;
+      width: min(340px, calc(100vw - 24px));
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+      pointer-events: none;
+      z-index: 9999;
+      line-height: 1.45;
+      backdrop-filter: blur(4px);
+    }
+
+    .tooltip-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #e2e8f0;
+    }
+
+    .tooltip-body {
+      font-size: 0.94rem;
       color: var(--muted);
     }
 
-    @media (max-width: 640px) {
-      .header {
-        flex-direction: column;
-        gap: 10px;
+    .legend {
+      color: #94a3b8;
+      font-size: 0.88rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 700px) {
+      .title-wrap h1 {
+        font-size: 1.25rem;
+      }
+
+      .title-wrap .subtitle {
+        font-size: 0.88rem;
+      }
+
+      .tooltip {
+        width: min(300px, calc(100vw - 20px));
       }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-
-    <div class="header">
-      <h1>Launch Map 🗺️</h1>
-      <a href="index.html" class="back-btn">← Back to Launch Pad</a>
+  <div class="page">
+    <div class="topbar">
+      <div class="title-wrap">
+        <h1>Life Ascent Map 🗺️</h1>
+        <div class="subtitle">Hover over a stage to see the reminder behind the domain.</div>
+      </div>
+      <a href="index.html" class="back-btn">← Back</a>
     </div>
 
-    <div class="image-wrapper">
-      <img src="Launch_Pad_Map.png" alt="Launch Pad Map" />
+    <div class="map-stage">
+      <div class="map-wrap" id="mapWrap">
+        <img
+          src="Launch_Pad_Map.png"
+          alt="Launch Pad Map"
+          class="map-image"
+        />
+
+        <!-- 01 Physical -->
+        <button
+          class="hotspot"
+          style="left: 2.5%; top: 39%; width: 17%; height: 18%;"
+          data-title="01 Physical"
+          data-text="Physical is the load-bearing base. Sleep, movement, nutrition, recovery, and addressing real health issues support everything above it. Do not expect stable ascent from a neglected foundation.">
+        </button>
+
+        <!-- 02 Emotional -->
+        <button
+          class="hotspot"
+          style="left: 20%; top: 55%; width: 16%; height: 18%;"
+          data-title="02 Emotional"
+          data-text="Emotional health affects resilience, clarity, stress response, and self-awareness. The aim is not constant comfort, but steadiness, honesty, and enough inner room to respond instead of react.">
+        </button>
+
+        <!-- 03 Interpersonal -->
+        <button
+          class="hotspot"
+          style="left: 20%; top: 74%; width: 17%; height: 18%;"
+          data-title="03 Interpersonal"
+          data-text="Interpersonal life is about trust, communication, and maintaining meaningful connection. Friends, family, and close relationships are not side quests. They stabilize life and often reveal what matters most.">
+        </button>
+
+        <!-- 04 Chronological -->
+        <button
+          class="hotspot"
+          style="left: 22%; top: 17%; width: 21%; height: 20%;"
+          data-title="04 Chronological"
+          data-text="Chronological is your relationship to time: rhythm, planning, priorities, pacing, and sequence. Good timing helps lower tiers stay supported and keeps aspiration from turning into drift or overload.">
+        </button>
+
+        <!-- 05 Financial -->
+        <button
+          class="hotspot"
+          style="left: 48%; top: 47%; width: 18%; height: 23%;"
+          data-title="05 Financial"
+          data-text="Financial health creates breathing room. It is not only about accumulation, but about margin, stewardship, reduced pressure, and the ability to support the life you are trying to build.">
+        </button>
+
+        <!-- 06 Communal -->
+        <button
+          class="hotspot"
+          style="left: 64%; top: 31%; width: 16%; height: 21%;"
+          data-title="06 Communal"
+          data-text="Communal is about engaging beyond the self: contribution, collaboration, service, and place within a wider system. It asks how your life connects outward, not just how it functions inward.">
+        </button>
+
+        <!-- 07 Aspirational -->
+        <button
+          class="hotspot"
+          style="left: 76%; top: 8%; width: 22%; height: 48%;"
+          data-title="07 Aspirational"
+          data-text="Aspirational is where creativity, learning, building, music, tinkering, reflection, and growth expand. This is the great beyond. It is meant to be pursued boldly, but not at the expense of the foundation that makes it sustainable.">
+        </button>
+      </div>
     </div>
 
-    <div class="footer">
-      Full mission path overview
+    <div class="legend">
+      These hover zones scale with the image because they are positioned by percentage inside the same responsive image container.
     </div>
-
   </div>
+
+  <div class="tooltip" id="tooltip">
+    <div class="tooltip-title" id="tooltipTitle"></div>
+    <div class="tooltip-body" id="tooltipBody"></div>
+  </div>
+
+  <script>
+    const tooltip = document.getElementById("tooltip");
+    const tooltipTitle = document.getElementById("tooltipTitle");
+    const tooltipBody = document.getElementById("tooltipBody");
+    const hotspots = document.querySelectorAll(".hotspot");
+
+    function placeTooltip(e) {
+      const offset = 18;
+      const tooltipRect = tooltip.getBoundingClientRect();
+
+      let left = e.clientX + offset;
+      let top = e.clientY + offset;
+
+      if (left + tooltipRect.width > window.innerWidth - 10) {
+        left = e.clientX - tooltipRect.width - offset;
+      }
+
+      if (top + tooltipRect.height > window.innerHeight - 10) {
+        top = e.clientY - tooltipRect.height - offset;
+      }
+
+      left = Math.max(10, left);
+      top = Math.max(10, top);
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    }
+
+    hotspots.forEach(hotspot => {
+      hotspot.addEventListener("mouseenter", e => {
+        tooltipTitle.textContent = hotspot.dataset.title;
+        tooltipBody.textContent = hotspot.dataset.text;
+        tooltip.style.display = "block";
+        placeTooltip(e);
+      });
+
+      hotspot.addEventListener("mousemove", e => {
+        placeTooltip(e);
+      });
+
+      hotspot.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+
+      hotspot.addEventListener("focus", () => {
+        tooltipTitle.textContent = hotspot.dataset.title;
+        tooltipBody.textContent = hotspot.dataset.text;
+        tooltip.style.display = "block";
+
+        const rect = hotspot.getBoundingClientRect();
+        const fakeEvent = {
+          clientX: rect.right,
+          clientY: rect.top + 10
+        };
+        placeTooltip(fakeEvent);
+      });
+
+      hotspot.addEventListener("blur", () => {
+        tooltip.style.display = "none";
+      });
+    });
+
+    window.addEventListener("resize", () => {
+      tooltip.style.display = "none";
+    });
+  </script>
 </body>
 </html>
